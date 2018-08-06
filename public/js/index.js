@@ -1,5 +1,25 @@
 var socket = io();
 
+function scrollToBottom () {
+  //Selectors
+  var messages = jQuery('#messages');
+  var newMessage = messages.children('li:last-child')
+  //Heights
+  var clientHeight = messages.prop('clientHeight');
+  var scrollHeight = messages.prop('scrollHeight');
+  var scrollTop = messages.prop('scrollTop');
+  var newMessageHeight = newMessage.innerHeight();
+  var lastMessageHeight = newMessage.prev().innerHeight();
+  console.log(clientHeight, scrollHeight, scrollTop, newMessageHeight, lastMessageHeight);
+  console.log(newMessage);
+
+  if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+    messages.scrollTop(scrollHeight);
+  }
+}
+
+
+
 socket.on('connect',  function () {  //arrow function not supported except in Chrome
   console.log('Connected to server');
 
@@ -20,16 +40,10 @@ socket.on('newMessage', function(message) {
   });
 
   jQuery('#messages').append(html);
-  // var formattedTime = moment(message.createdAt).format('h:mm a');
-  // console.log('New message', message);
-  // var li = jQuery('<li></li>');
-  // li.text(`${message.from} ${formattedTime}: ${message.text}`);
-  //
-  // jQuery('#messages').append(li);
+  scrollToBottom();
 });
 
 socket.on('newLocationMessage', function (message) {
-  console.log(message.url);
   var formattedTime = moment(message.createdAt).format('h:mm a');
   var template = jQuery('#location-message-template').html();
   var html = Mustache.render(template, {
@@ -38,16 +52,8 @@ socket.on('newLocationMessage', function (message) {
     createdAt: formattedTime
   });
   jQuery('#messages').append(html);
-  // var li = jQuery('<li></li>');
-  // var a = jQuery('<a target="_blank">My current location</a>');
-  // li.text(`${message.from} ${formattedTime}: `);
-//attr() with one argument (eg target) will fetch the value.  With two arguments
-//it will set the value of the first with data from second
-  // a.attr('href', message.url);
-  // li.append(a);
-  //
-  // jQuery('#messages').append(li);
-});
+  scrollToBottom();
+  });
 
 
 //need to override the default behaviour of browser to refresh page
@@ -59,7 +65,7 @@ jQuery('#message-form').on('submit', function(e) {
     from: 'User',
     text: messageTextBox.val()
   }, function () {
-    console.log('this is the acknowledgement');
+    // console.log('this is the acknowledgement');
     messageTextBox.val('')
   });
 });
