@@ -11,18 +11,20 @@ socket.on('disconnect', function () {
 });
 
 socket.on('newMessage', function(message) {
+  var formattedTime = moment(message.createdAt).format('h:mm a');
   console.log('New message', message);
   var li = jQuery('<li></li>');
-  li.text(`${message.from}: ${message.text}`);
+  li.text(`${message.from} ${formattedTime}: ${message.text}`);
 
   jQuery('#messages').append(li);
 });
 
 socket.on('newLocationMessage', function (message) {
+  var formattedTime = moment(message.createdAt).format('h:mm a');
   console.log('Location', message);
   var li = jQuery('<li></li>');
   var a = jQuery('<a target="_blank">My current location</a>');
-  li.text(`${message.from}: `);
+  li.text(`${message.from} ${formattedTime}: `);
 //attr() with one argument (eg target) will fetch the value.  With two arguments
 //it will set the value of the first with data from second
   a.attr('href', message.url);
